@@ -1,0 +1,642 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #050505;
+    color: #b0b0b0;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    user-select: none;
+    cursor: default;
+    transition: background-color 0.5s ease;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* The specific red you liked */
+body.panic-mode { background-color: #300000; transition: 0.1s; } 
+body.zen-mode { background-color: #051525; transition: 3s; }
+body.alien-mode { background-color: #001a00; transition: 1s; }
+
+/* --- ANIMATIONS --- */
+@keyframes violence {
+    0% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(-5px, 5px) rotate(-1deg); }
+    75% { transform: translate(5px, -5px) rotate(1deg); }
+    100% { transform: translate(0,0) rotate(0deg); }
+}
+.violent-shake { animation: violence 0.15s infinite; }
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+.floating { animation: float 3s ease-in-out infinite; }
+
+/* --- APP CONTAINER --- */
+.App {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: #050505;
+    transition: background-color 0.5s ease;
+    overflow: hidden;
+}
+
+.App.panic-mode { background-color: #300000; transition: 0.1s; }
+.App.zen-mode { background-color: #051525; transition: 3s; }
+.App.alien-mode { background-color: #001a00; transition: 1s; }
+
+/* --- TEXT CONTAINER --- */
+#text-container {
+    width: 90%;
+    max-width: 900px;
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    padding: 20px;
+}
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    #text-container {
+        width: 85%;
+        padding: 20px 40px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1440px) {
+    #text-container {
+        width: 80%;
+    }
+}
+
+.cinematic-text {
+    font-size: 1.4rem;
+    font-weight: 300;
+    line-height: 1.6;
+    letter-spacing: 1px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* Laptop and larger screens */
+@media (min-width: 1024px) {
+    .cinematic-text {
+        font-size: 1.8rem;
+    }
+}
+
+/* Desktop and larger */
+@media (min-width: 1440px) {
+    .cinematic-text {
+        font-size: 2.2rem;
+    }
+}
+
+/* Very small mobile screens */
+@media (max-width: 480px) {
+    .cinematic-text {
+        font-size: 1.2rem;
+    }
+}
+
+.cinematic-text.visible { opacity: 1; transform: translateY(0); }
+
+.highlight { color: #fff; font-weight: 600; }
+.blue-glow { color: #81d4fa; text-shadow: 0 0 10px rgba(129, 212, 250, 0.5); }
+.angry { color: #e74c3c; font-weight: 800; text-shadow: 0 0 20px rgba(231, 76, 60, 0.5); }
+.alien-text { font-family: 'Fira Code', monospace; color: #00ff00; text-shadow: 0 0 10px #00ff00; }
+
+/* Code Block */
+.code-block { 
+    font-family: 'Fira Code', monospace; 
+    color: #0f0; 
+    font-size: 0.65rem; 
+    text-align: left; 
+    background: #111; 
+    padding: 15px; 
+    border: 1px solid #333; 
+    margin-top: 20px; 
+    display: none; 
+    width: 90%; 
+    max-width: 800px;
+    word-break: break-all;
+    overflow-x: auto;
+}
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    .code-block {
+        font-size: 0.8rem;
+        padding: 20px;
+        width: 85%;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1440px) {
+    .code-block {
+        font-size: 0.9rem;
+        width: 80%;
+    }
+}
+
+/* CLONES & DOT */
+.dot-character {
+    font-family: 'Fira Code', monospace; 
+    font-size: 2rem; 
+    color: #d63031;
+    text-shadow: 0 0 15px rgba(214, 48, 49, 0.8); 
+    margin-top: 20px; 
+    display: none;
+}
+.dot-text {
+    font-family: 'Fira Code', monospace; 
+    font-size: 1rem; 
+    color: #fab1a0; 
+    margin-top: 10px; 
+    display: none;
+}
+.clones-display {
+    font-family: 'Fira Code', monospace; 
+    font-size: 0.9rem; 
+    color: #0f0;
+    margin-top: 30px; 
+    letter-spacing: 3px; 
+    display: none;
+}
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    .dot-character {
+        font-size: 2.5rem;
+    }
+    .dot-text {
+        font-size: 1.1rem;
+    }
+    .clones-display {
+        font-size: 1.2rem;
+        letter-spacing: 4px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1440px) {
+    .dot-character {
+        font-size: 3rem;
+    }
+    .dot-text {
+        font-size: 1.2rem;
+    }
+    .clones-display {
+        font-size: 1.5rem;
+        letter-spacing: 5px;
+    }
+}
+
+/* CHAOS GRID */
+#chaos-grid {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    display: none; 
+    grid-template-columns: 1fr 1fr 1fr; 
+    z-index: 5;
+    background: #000;
+}
+.chaos-col {
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    overflow: hidden; 
+    font-family: 'Fira Code', monospace; 
+    padding: 10px; 
+    text-align: center;
+}
+#chaos-left { 
+    border-right: 1px solid #333; 
+    color: #0f0; 
+    font-size: 1rem; 
+}
+#chaos-center { 
+    border-right: 1px solid #333; 
+    color: #fff; 
+    font-size: 0.7rem; 
+}
+#chaos-right { 
+    color: #e74c3c; 
+    font-size: 2.5rem; 
+}
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    .chaos-col {
+        padding: 15px;
+    }
+    #chaos-left { 
+        font-size: 1.3rem; 
+    }
+    #chaos-center { 
+        font-size: 0.9rem; 
+    }
+    #chaos-right { 
+        font-size: 3.5rem; 
+    }
+}
+
+/* Desktop */
+@media (min-width: 1440px) {
+    .chaos-col {
+        padding: 20px;
+    }
+    #chaos-left { 
+        font-size: 1.5rem; 
+    }
+    #chaos-center { 
+        font-size: 1rem; 
+    }
+    #chaos-right { 
+        font-size: 4rem; 
+    }
+}
+
+/* --- INTERACTION AREA --- */
+#interaction-area {
+    position: absolute; 
+    bottom: 5%; 
+    width: 100%;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+    gap: 15px; 
+    opacity: 0; 
+    pointer-events: none; 
+    transition: opacity 0.5s; 
+    z-index: 2;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+#interaction-area.active { opacity: 1; pointer-events: auto; }
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    #interaction-area {
+        bottom: 10%;
+        gap: 20px;
+    }
+}
+
+input {
+    background: transparent; 
+    border: none; 
+    border-bottom: 2px solid #444;
+    color: #fff; 
+    font-size: 1rem; 
+    text-align: center; 
+    padding: 10px;
+    width: 80%; 
+    max-width: 400px;
+    font-family: 'Fira Code', monospace; 
+    outline: none; 
+    transition: 0.3s;
+}
+input:focus { border-color: #fff; }
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    input {
+        font-size: 1.3rem;
+        width: 60%;
+        max-width: 500px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1440px) {
+    input {
+        font-size: 1.5rem;
+    }
+}
+
+.choice-btn {
+    background: transparent; 
+    border: 1px solid #333; 
+    color: #888;
+    padding: 12px 20px; 
+    font-size: 0.85rem; 
+    cursor: pointer; 
+    transition: 0.3s;
+    border-radius: 4px; 
+    min-width: 280px;
+    max-width: 90%;
+    font-family: inherit; 
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    white-space: normal;
+    line-height: 1.3;
+}
+.choice-btn:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); }
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    .choice-btn {
+        padding: 15px 30px;
+        font-size: 0.95rem;
+        min-width: 320px;
+        white-space: nowrap;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1440px) {
+    .choice-btn {
+        font-size: 1rem;
+        min-width: 350px;
+    }
+}
+
+/* Very small mobile screens */
+@media (max-width: 480px) {
+    .choice-btn {
+        font-size: 0.75rem;
+        padding: 10px 15px;
+        min-width: 250px;
+    }
+}
+
+.btn-purge:hover { border-color: #e74c3c; color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
+.btn-save:hover { border-color: #2ecc71; color: #2ecc71; background: rgba(46, 204, 113, 0.1); }
+
+/* TIMER */
+#timer-display {
+    font-family: 'Fira Code', monospace; 
+    font-size: 2.5rem; 
+    color: #fff;
+    position: absolute; 
+    top: 5%; 
+    opacity: 0; 
+    transition: 0.5s;
+}
+#timer-display.visible { opacity: 1; }
+#timer-display.panic { color: #e74c3c; animation: shake 0.1s infinite; }
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    #timer-display {
+        font-size: 3.5rem;
+        top: 10%;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1440px) {
+    #timer-display {
+        font-size: 4rem;
+    }
+}
+
+/* Very small mobile screens */
+@media (max-width: 480px) {
+    #timer-display {
+        font-size: 2rem;
+    }
+}
+
+/* FINAL CARD */
+#final-ui {
+    display: none; flex-direction: column; align-items: center;
+    z-index: 10;
+}
+
+#final-ui.visible {
+    display: flex;
+}
+
+@keyframes shake { 0% { transform: translate(1px, 1px); } 100% { transform: translate(-1px, -1px); } }
+
+/* Hidden Clue */
+.hidden-clue {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-family: monospace;
+    font-size: 0.5rem;
+    color: #151515;
+    max-width: 200px;
+    text-align: right;
+}
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    .hidden-clue {
+        font-size: 0.6rem;
+        max-width: none;
+    }
+}
+
+/* Custom Cursor */
+.custom-cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* Result Card */
+.result-card {
+    background: #111;
+    border: 3px solid #e74c3c;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 90%;
+    width: 100%;
+    margin: 20px;
+    box-sizing: border-box;
+}
+
+.result-card h1 {
+    color: #e74c3c;
+    font-size: 1.5rem;
+    margin: 10px 0;
+    word-wrap: break-word;
+}
+
+.result-card h2 {
+    color: #fff;
+    font-size: 1.3rem;
+    margin: 15px 0;
+    word-wrap: break-word;
+}
+
+.result-card p {
+    color: #aaa;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 15px 0;
+}
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    .result-card {
+        padding: 30px;
+        max-width: 600px;
+    }
+    .result-card h1 {
+        font-size: 2rem;
+    }
+    .result-card h2 {
+        font-size: 1.6rem;
+    }
+    .result-card p {
+        font-size: 1.1rem;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1440px) {
+    .result-card {
+        padding: 40px;
+    }
+    .result-card h1 {
+        font-size: 2.5rem;
+    }
+    .result-card h2 {
+        font-size: 2rem;
+    }
+    .result-card p {
+        font-size: 1.2rem;
+    }
+}
+
+/* Very small mobile screens */
+@media (max-width: 480px) {
+    .result-card {
+        padding: 15px;
+        margin: 10px;
+    }
+    .result-card h1 {
+        font-size: 1.2rem;
+    }
+    .result-card h2 {
+        font-size: 1.1rem;
+    }
+    .result-card p {
+        font-size: 0.85rem;
+    }
+}
+
+/* Tablet screens */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .cinematic-text {
+        font-size: 1.6rem;
+    }
+    .choice-btn {
+        font-size: 0.9rem;
+        min-width: 300px;
+    }
+}
+
+/* Mobile landscape */
+@media (max-height: 600px) and (orientation: landscape) {
+    .cinematic-text {
+        font-size: 1rem;
+    }
+    #timer-display {
+        font-size: 1.8rem;
+        top: 3%;
+    }
+    #text-container {
+        min-height: 100px;
+        padding: 10px;
+    }
+    #interaction-area {
+        bottom: 3%;
+        gap: 10px;
+    }
+    .choice-btn {
+        padding: 8px 15px;
+        font-size: 0.75rem;
+        min-width: 200px;
+    }
+}
+
+.score-bar {
+    margin: 12px 0;
+    text-align: left;
+    width: 100%;
+}
+
+.score-bar-label {
+    color: #fff;
+    font-family: 'Fira Code', monospace;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+}
+
+.score-bar-container {
+    background: #222;
+    height: 25px;
+    border: 1px solid #444;
+    position: relative;
+}
+
+.score-bar-fill {
+    background: linear-gradient(90deg, #e74c3c, #f39c12);
+    height: 100%;
+    transition: width 1s ease;
+}
+
+.score-value {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+}
+
+/* Laptop and larger */
+@media (min-width: 1024px) {
+    .score-bar {
+        margin: 15px 0;
+    }
+    .score-bar-label {
+        font-size: 1rem;
+    }
+    .score-bar-container {
+        height: 30px;
+    }
+    .score-value {
+        font-size: 1rem;
+    }
+}
+
