@@ -4,14 +4,37 @@ import './App.css';
 // Jumping Button Component
 function JumpingButton({ opt, onComplete }) {
   const [jumps, setJumps] = useState(0);
-  const [transform, setTransform] = useState('translate(0px, 0px)');
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const btnRef = useRef(null);
 
   const moveBtn = () => {
-    if (jumps < 4) {
-      const randomX = (Math.random() - 0.5) * 200;
-      const randomY = (Math.random() - 0.5) * 200;
-      setTransform(`translate(${randomX}px, ${randomY}px)`);
+    if (jumps < 4 && btnRef.current) {
+      const btn = btnRef.current;
+      const rect = btn.getBoundingClientRect();
+      const btnWidth = rect.width;
+      const btnHeight = rect.height;
+      
+      // Get viewport dimensions
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate safe boundaries with padding
+      const padding = 20;
+      const maxX = viewportWidth - btnWidth - padding;
+      const maxY = viewportHeight - btnHeight - padding;
+      
+      // Generate random position within safe area
+      const newX = Math.random() * Math.max(0, maxX - padding) + padding;
+      const newY = Math.random() * Math.max(0, maxY - padding) + padding;
+      
+      // Calculate offset from current position to new absolute position
+      const currentLeft = rect.left;
+      const currentTop = rect.top;
+      
+      const offsetX = newX - currentLeft + position.x;
+      const offsetY = newY - currentTop + position.y;
+      
+      setPosition({ x: offsetX, y: offsetY });
       setJumps(prev => prev + 1);
     }
   };
@@ -26,7 +49,11 @@ function JumpingButton({ opt, onComplete }) {
     <button
       ref={btnRef}
       className={`choice-btn ${opt.class || ''}`}
-      style={{ transform }}
+      style={{ 
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        position: 'relative',
+        zIndex: 1000
+      }}
       onMouseOver={moveBtn}
       onTouchStart={moveBtn}
       onClick={handleClick}
