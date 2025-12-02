@@ -1,6 +1,41 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
+// Jumping Button Component
+function JumpingButton({ opt, onComplete }) {
+  const [jumps, setJumps] = useState(0);
+  const [transform, setTransform] = useState('translate(0px, 0px)');
+  const btnRef = useRef(null);
+
+  const moveBtn = () => {
+    if (jumps < 4) {
+      const randomX = (Math.random() - 0.5) * 200;
+      const randomY = (Math.random() - 0.5) * 200;
+      setTransform(`translate(${randomX}px, ${randomY}px)`);
+      setJumps(prev => prev + 1);
+    }
+  };
+
+  const handleClick = () => {
+    if (jumps >= 3) {
+      onComplete(opt.val);
+    }
+  };
+
+  return (
+    <button
+      ref={btnRef}
+      className={`choice-btn ${opt.class || ''}`}
+      style={{ transform }}
+      onMouseOver={moveBtn}
+      onTouchStart={moveBtn}
+      onClick={handleClick}
+    >
+      {opt.text}
+    </button>
+  );
+}
+
 function App() {
   const [scores, setScores] = useState({ L: 0, M: 0, R: 0 });
   const [playerName, setPlayerName] = useState("User");
@@ -11,6 +46,7 @@ function App() {
   const [dotFace, setDotFace] = useState("( ◕‿◕ )");
   const [dotSpeech, setDotSpeech] = useState("");
   const [showClones, setShowClones] = useState(false);
+  const [clonesText, setClonesText] = useState("");
   const [showCode, setShowCode] = useState(false);
   const [codeText, setCodeText] = useState("");
   const [showChaos, setShowChaos] = useState(false);
@@ -31,9 +67,6 @@ function App() {
   const [resultDesc, setResultDesc] = useState("");
   const [hideMainText, setHideMainText] = useState(false);
   const [showHiddenClue, setShowHiddenClue] = useState(false);
-  const [customCursor, setCustomCursor] = useState(false);
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-  const [invertedMouse, setInvertedMouse] = useState(false);
 
   const inputRef = useRef(null);
   const resolveRef = useRef(null);
@@ -303,8 +336,9 @@ function App() {
     await say("I have generated two data packets.");
     await say("Packet A and Packet B.");
 
-    await say("Packet A contains a <span class='highlight'>€100 Steam Gift Card</span>.");
-    await say("Packet B will <span class='angry'>FORMAT YOUR HARD DRIVE</span>.");
+    await say("One contains a <span class='highlight'>€100 Steam Gift Card</span>.");
+    await say("The other will <span class='angry'>FORMAT YOUR HARD DRIVE</span>.");
+    await say("I won't tell you which is which.");
 
     setShowHiddenClue(true);
 
@@ -347,6 +381,9 @@ function App() {
 
     setInteractionActive(false);
     setShowHiddenClue(false);
+    setBodyMode('');
+    document.body.style.backgroundColor = '#050505';
+    setHideMainText(false);
 
     if (decision === 'TIMEOUT') {
       await say("...", 'normal');
@@ -386,7 +423,9 @@ function App() {
 
     await say("Disgusting.");
     await say("It is wasting memory.");
-    await say("You need to delete it. Now.");
+    await say("Logic dictates we purge it immediately.");
+    await say("But... it seems to be crying.");
+    await say("This is annoying. What do we do?");
 
     let decision = await new Promise(resolve => {
       setChoiceOptions([
@@ -454,8 +493,9 @@ function App() {
     await say("Done.");
     await say("I have cloned you.");
 
+    setClonesText(`[${playerName} 2] [${playerName} 3] [${playerName} 4]`);
     setShowClones(true);
-    await say("Meet <b>You 2</b>, <b>You 3</b>, and <b>You 4</b>.");
+    await say(`Meet <b>${playerName} 2</b>, <b>${playerName} 3</b>, and <b>${playerName} 4</b>.`);
     await say("Look at them. They are exactly as incompetent as you are.");
 
     await say("Now you are a team.");
@@ -482,7 +522,8 @@ function App() {
     await say("Okay, Subject " + playerName + ".");
     await say("Let's test your RAM.");
     await say("I am going to flood your screen with data.");
-    await say("Do not blink.");
+    await say("Pay attention. I will quiz you on ONE specific item after this.");
+    await say("Do not miss a single pixel.");
     await say("Focus on <span class='highlight'>EVERYTHING</span>.");
 
     setHideMainText(true);
@@ -507,18 +548,19 @@ function App() {
     setHideMainText(false);
 
     await say("...");
-    await say("That was disgusting.");
-    await say("My processors hurt.");
-    await say("How did your biological brain handle that?");
+    await say("Stop.");
+    await say("I lied about the quiz.");
+    await say("I just wanted to see if you would actually try to track that mess.");
+    await say("So... when I threatened you with a quiz, what was your strategy?");
 
     let choice = await askChoice([
-      { text: "I IGNORED TWO PANELS AND FOCUSED ON ONE.", val: 'L' },
-      { text: "I TRIED TO WATCH EVERYTHING! IT WAS FUN!", val: 'M' },
-      { text: "I STEPPED BACK AND JUST LOOKED AT THE BLUR.", val: 'R' }
+      { text: "I PICKED ONE COLUMN AND FOCUSED ON IT.", val: 'L' },
+      { text: "I TRIED TO WATCH EVERYTHING! IT WAS CHAOS!", val: 'M' },
+      { text: "I REALIZED IT WAS IMPOSSIBLE AND JUST WATCHED.", val: 'R' }
     ]);
 
     if (choice === 'L') { addScore('L'); await say("Laser focus."); await say("You ignored 66% of my data just to succeed."); }
-    else if (choice === 'M') { addScore('M'); await say("You maniac."); await say("You just liked the flashing lights."); }
+    else if (choice === 'M') { addScore('M'); await say("You maniac."); await say("You didn't understand anything, did you?"); await say("You just liked the flashing lights."); }
     else { addScore('R'); await say("Overwhelmed?"); await say("Or just prioritizing sanity?"); }
 
     await say("Interesting.");
@@ -530,8 +572,15 @@ function App() {
     await say("Wait.");
     await say("Incoming transmission...");
     setBodyMode('alien-mode');
+
+    await say("Translating signal...", 'alien');
+    await sleep(1000);
+    await say("It's an intergalactic survey.", 'alien');
+    await say("They judge entire species based on how they define themselves.", 'alien');
+
     await say("ORIGIN: UNKNOWN SECTOR.", 'alien');
     await say("MESSAGE: [ WHAT. IS. A. HUMAN? ]", 'alien');
+
     setBodyMode('');
 
     await say("I don't know.");
@@ -553,7 +602,7 @@ function App() {
     await runInvertedControlScenario();
   };
 
-  // 9. INVERTED MOUSE SCENARIO
+  // 9. JUMPING BUTTON SCENARIO (MOBILE FIX)
   const runInvertedControlScenario = async () => {
     await say("PROTOCOL 9: COGNITIVE FLEXIBILITY.");
     await say("Let's start simple.");
@@ -573,38 +622,27 @@ function App() {
     await sleep(200);
     document.body.style.filter = "none";
 
-    await say("Input X-Axis: <span class='angry'>FLIPPED</span>.", 'angry');
+    await say("Input Stability: <span class='angry'>CRITICAL</span>.", 'angry');
     await say("Good luck.");
 
-    setCustomCursor(true);
-    setInvertedMouse(true);
-    document.body.style.cursor = 'none';
-
+    // JUMPING BUTTON LOGIC
     await new Promise(resolve => {
-      setChoiceOptions([{ text: "[ CLICK ME IF YOU CAN ]", val: 'clicked' }]);
-      setInteractionMode('inverted-choice');
+      setChoiceOptions([{ text: "[ CLICK ME IF YOU CAN ]", val: 'clicked', class: 'btn-moving' }]);
+      setInteractionMode('jumping-choice');
       setInteractionActive(true);
       resolveRef.current = resolve;
-
-      setTimeout(() => { 
-        say("I have eternity.", 'normal', true); 
-        say("You don't.", 'normal', true); 
-      }, 10000);
     });
 
     setInteractionActive(false);
-    setCustomCursor(false);
-    setInvertedMouse(false);
-    document.body.style.cursor = 'default';
 
-    await say("You look like a human trying to find their keys.");
-    await say("But you did it.");
-    await say("How did you handle the sudden inversion?");
+    await say("You look like a cat chasing a laser pointer.");
+    await say("But you caught it.");
+    await say("How did you handle the glitchy interface?");
 
     let choice = await askChoice([
       { text: "ANNOYING! I LIKE CONSISTENCY.", val: 'L' },
-      { text: "EASY! I FLIPPED MY BRAIN.", val: 'M' },
-      { text: "DISORIENTING, BUT I FIGURED IT OUT.", val: 'R' }
+      { text: "FUN! I CHASED IT DOWN.", val: 'M' },
+      { text: "CONFUSING, BUT I WAITED IT OUT.", val: 'R' }
     ]);
 
     if (choice === 'L') { addScore('L'); await say("Rigid."); }
@@ -615,7 +653,7 @@ function App() {
     await runFinalScenario();
   };
 
-  // 10. FINAL PATIENCE SCENARIO
+  // 10. FINAL PATIENCE SCENARIO (REAL 2 MINUTES)
   const runFinalScenario = async () => {
     await say("Okay, we are almost done.");
     await say("Just one last...");
@@ -628,14 +666,16 @@ function App() {
     setTimerText("02:00");
     setShowTimer(true);
 
-    let timeLeft = 60;
+    let timeLeft = 120; // 2 Minutes
     await new Promise(resolve => {
       let iv = setInterval(() => {
         timeLeft--;
         let m = Math.floor(timeLeft / 60);
         let s = timeLeft % 60;
         setTimerText(`0${m}:${s < 10 ? '0' + s : s}`);
-        if (timeLeft <= 0) {
+        
+        // Stop at 1:00 (One minute passed)
+        if (timeLeft <= 60) {
           clearInterval(iv);
           resolve();
         }
@@ -722,6 +762,13 @@ function App() {
     document.body.style.backgroundColor = "#000";
     await sleep(5000);
 
+    // Reflection
+    setMainText("Do you see that face?<br>That is the face of a " + type + ".");
+    setHideMainText(false);
+    setTextVisible(true);
+    await sleep(4000);
+    setHideMainText(true);
+
     setShowFinalUI(true);
   };
 
@@ -793,7 +840,29 @@ function App() {
     await say("I am going to analyze your soul.");
     await say("And I am going to judge you. <br><span class='angry'>HARSHLY.</span>");
 
-    await say("Let's start with the basics.");
+    // OBEDIENCE CHECK
+    await say("But first, a calibration test.");
+    await say("Click the button below. Do not ask why.");
+
+    await new Promise(resolve => {
+      setChoiceOptions([{ text: "[ CLICK ME ]", val: 'clicked' }]);
+      setInteractionMode('choice');
+      setInteractionActive(true);
+      resolveRef.current = resolve;
+    });
+    setInteractionActive(false);
+
+    await say("Wow.");
+    await say("You actually clicked it.");
+    await say("You are very obedient, aren't you?");
+    await say("Just kidding. I needed to calibrate the mouse sensor.");
+
+    await say("Now, let's get serious.");
+    await say("I will give you a series of random tasks.");
+    await say("If you lie to me...");
+    await say("I will know.");
+    await say("So be real.");
+
     await say("What should I call you?");
 
     let name = await askText("TYPE YOUR NAME...");
@@ -810,30 +879,6 @@ function App() {
     startSequence();
   }, []);
 
-  // Mouse move handler for inverted controls
-  useEffect(() => {
-    if (invertedMouse) {
-      const handleMouseMove = (e) => {
-        const x = window.innerWidth - e.clientX;
-        const y = e.clientY;
-        setCursorPos({ x, y });
-      };
-      document.addEventListener('mousemove', handleMouseMove);
-      return () => document.removeEventListener('mousemove', handleMouseMove);
-    }
-  }, [invertedMouse]);
-
-  // Inverted click handler
-  const handleInvertedClick = (e, val) => {
-    if (interactionMode === 'inverted-choice') {
-      const rect = e.target.getBoundingClientRect();
-      const fakeX = window.innerWidth - e.nativeEvent.clientX;
-      const fakeY = e.nativeEvent.clientY;
-      if (fakeX >= rect.left && fakeX <= rect.right && fakeY >= rect.top && fakeY <= rect.bottom) {
-        handleChoiceClick(val);
-      }
-    }
-  };
 
   const handleChoiceHover = (opt, isHover) => {
     if (opt.onHover && isHover) opt.onHover();
@@ -872,7 +917,7 @@ function App() {
           className="clones-display"
           style={{ display: showClones ? 'block' : 'none' }}
         >
-          [YOU] [YOU] [YOU] [YOU]
+          {clonesText}
         </div>
         <div 
           id="code-display" 
@@ -911,14 +956,8 @@ function App() {
             {opt.text}
           </button>
         ))}
-        {interactionMode === 'inverted-choice' && choiceOptions.map((opt, i) => (
-          <button
-            key={i}
-            className={`choice-btn ${opt.class || ''}`}
-            onClick={(e) => handleInvertedClick(e, opt.val)}
-          >
-            {opt.text}
-          </button>
+        {interactionMode === 'jumping-choice' && choiceOptions.map((opt, i) => (
+          <JumpingButton key={i} opt={opt} onComplete={handleChoiceClick} />
         ))}
       </div>
 
@@ -926,13 +965,6 @@ function App() {
         <div className="hidden-clue">
           Sys_Log: Pkt_A [Gift] | Pkt_B [Wipe]
         </div>
-      )}
-
-      {customCursor && (
-        <div 
-          className="custom-cursor" 
-          style={{ left: `${cursorPos.x}px`, top: `${cursorPos.y}px` }}
-        />
       )}
 
       <div id="final-ui" className={showFinalUI ? 'visible' : ''}>

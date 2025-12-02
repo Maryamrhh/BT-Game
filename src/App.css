@@ -183,8 +183,9 @@ body.alien-mode { background-color: #001a00; transition: 1s; }
     font-size: 0.9rem; 
     color: #0f0;
     margin-top: 30px; 
-    letter-spacing: 3px; 
+    letter-spacing: 2px; 
     display: none;
+    text-align: center;
 }
 
 /* Laptop and larger */
@@ -197,7 +198,7 @@ body.alien-mode { background-color: #001a00; transition: 1s; }
     }
     .clones-display {
         font-size: 1.2rem;
-        letter-spacing: 4px;
+        letter-spacing: 2px;
     }
 }
 
@@ -210,8 +211,8 @@ body.alien-mode { background-color: #001a00; transition: 1s; }
         font-size: 1.2rem;
     }
     .clones-display {
-        font-size: 1.5rem;
-        letter-spacing: 5px;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
     }
 }
 
@@ -391,6 +392,12 @@ input:focus { border-color: #fff; }
 .btn-purge:hover { border-color: #e74c3c; color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
 .btn-save:hover { border-color: #2ecc71; color: #2ecc71; background: rgba(46, 204, 113, 0.1); }
 
+/* Moving Button (Scenario 9) */
+.btn-moving { 
+    position: relative; 
+    transition: all 0.1s; 
+}
+
 /* TIMER */
 #timer-display {
     font-family: 'Fira Code', monospace; 
@@ -445,7 +452,7 @@ input:focus { border-color: #fff; }
     right: 10px;
     font-family: monospace;
     font-size: 0.5rem;
-    color: #151515;
+    color: #333;
     max-width: 200px;
     text-align: right;
 }
@@ -453,20 +460,9 @@ input:focus { border-color: #fff; }
 /* Laptop and larger */
 @media (min-width: 1024px) {
     .hidden-clue {
-        font-size: 0.6rem;
+        font-size: 0.7rem;
         max-width: none;
     }
-}
-
-/* Custom Cursor */
-.custom-cursor {
-    position: fixed;
-    width: 20px;
-    height: 20px;
-    background-color: red;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
 }
 
 /* Result Card */
